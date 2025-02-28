@@ -1,0 +1,57 @@
+Start-Sleep -s 1
+[System.Windows.Forms.SendKeys]::SendWait("%{F4}")
+Start ms-settings:network-mobilehotspot
+Start-Process -FilePath "notepad" -Wait -WindowStyle Maximized
+
+Start-Process -FilePath " ms-settings:network-mobilehotspot" -Wait -WindowStyle Maximized
+
+powershell -NoProfile -ExecutionPolicy Unrestricted .\open_window.ps1
+Start-Sleep -s 5
+
+exit
+pause
+
+
+
+
+////////////////////
+ Add-Type -AssemblyName System.Windows.Forms
+Start-Process -FilePath "ms-settings:network-mobilehotspot"
+Start-Sleep -m 130
+[System.Windows.Forms.SendKeys]::SendWait("{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}")
+Start-Sleep -m 50
+[System.Windows.Forms.SendKeys]::SendWait(" ")
+Start-Sleep -m 50
+[System.Windows.Forms.SendKeys]::SendWait("%{F4}")
+Start-Sleep -m 50
+///////////////////////////////////
+ Add-Type -AssemblyName System.Windows.Forms
+Start-Process -FilePath "ms-settings:network-mobilehotspot"
+[String[]]$addressAp = @('192.168.137.1') 
+	$dead_or_alive = @{} 
+	for($i = 0; $i -lt $addressAp.Count; $i++){
+		$dead_or_alive.Add($addressAp[$i],'alive') 
+	}
+	for($i = 0; $i -lt $addressAp.Count; $i++) {
+	# Ping実行する。
+	$pingAlive = @(Test-Connection -ComputerName $addressAp[$i] -Quiet)
+		if ($pingAlive -eq $True) {
+			$message = "Check-DeadOrAlive SUCCESS:" + $addressAp[$i]
+			echo $message
+			$dead_or_alive[$addressAp[$i]] = 'alive'
+			powershell -NoProfile -ExecutionPolicy Unrestricted .\click_hotspot.ps1
+			Start-Sleep -s 1
+			powershell -NoProfile -ExecutionPolicy Unrestricted .\click_hotspot.ps1
+		} else {
+			if($dead_or_alive[$addressAp[$i]] -eq 'alive'){
+				$message = "Check-DeadOrAlive ERROR:" + $addressAp[$i]
+				echo $message
+				$dead_or_alive[$addressAp[$i]] = 'dead'
+				powershell -NoProfile -ExecutionPolicy Unrestricted .\click_hotspot.ps1
+			}
+		}
+ 	}
+Start-Sleep -m 50
+powershell -NoProfile -ExecutionPolicy Unrestricted .\close_window.ps1
+/////////////////////////////////////////
+
